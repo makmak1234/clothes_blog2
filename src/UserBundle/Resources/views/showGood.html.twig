@@ -79,6 +79,10 @@
                 <th>Proddatetimeupdate</th>
                 <td>{% if childrenGood.prodDatetimeUpdate %}{{ childrenGood.prodDatetimeUpdate|date('Y-m-d H:i:s') }}{% endif %}</td>
             </tr>
+            <tr>
+                <th></th>
+                <td><b><a href="{{ path('bag_registr') }}">Купить</a></b></td>
+            </tr>
 
             
         </tbody>

@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use AdminBundle\Entity\childrenGoods;
 use AdminBundle\Entity\childrenGoodsCategory;
 use AdminBundle\Entity\childrenGoodsSizeNumber;
+use UserBundle\Entity\bagRegisrtr;
 use AdminBundle\Form\childrenGoodsType;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -35,6 +36,220 @@ class indexUserController extends Controller
         return $this->render('UserBundle::indexUser.html.twig', array(
             'childrenGoods' => $childrenGoods,
             'childrenGoodsCategory' => $childrenGoodsCategory,
+        ));
+    }
+
+    /**
+     * Finds and displays a childrenGoods entity.
+     *
+     * @Route("/{id}", name="user_show")
+     * @Method("GET")
+     */
+    public function showAction(childrenGoods $childrenGood, Request $request)
+    {
+        /*$add_new_cat = 'nety';
+        if(isset($_GET["add_new_cat"])){
+                //$add_new_cat = $_GET["add_new_cat"];
+                $add_new_cat = $request->query->get('add_new_cat');
+            }*/
+        
+
+        $deleteForm = $this->createDeleteForm($childrenGood);
+
+        return $this->render('UserBundle::showGood.html.twig', array(
+            'childrenGood' => $childrenGood,
+            'delete_form' => $deleteForm->createView(),
+            //s'add_new_cat' => $add_new_cat,
+        ));
+    }
+
+    /**
+     * Finds and displays a childrenGoods entity.
+     *
+     * @Route("/{children_goods_category_id}/{children_goods_subcategory_id}", name="cat_sub_show")
+     * @Method("GET")
+     */
+    public function showSubcatAction($children_goods_category_id, $children_goods_subcategory_id )// ,$children_goods_category_id, $children_goods_subcategory_id  {children_goods_category_id}/{children_goods_subcategory_id}
+    {
+        /*$add_new_cat = 'nety';
+        if(isset($_GET["add_new_cat"])){
+                //$add_new_cat = $_GET["add_new_cat"];
+                $add_new_cat = $request->query->get('add_new_cat');
+            }*/
+        
+
+        //$deleteForm = $this->createDeleteForm($childrenGood);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $repository = $em->getRepository('AdminBundle:childrenGoods');
+
+        $category = $em->getRepository('AdminBundle:childrenGoodsCategory')
+                    ->findOneById($children_goods_category_id);
+
+        $subcategory = $em->getRepository('AdminBundle:childrenGoodsSubcategory')
+                    ->findOneById($children_goods_subcategory_id);
+
+        $query = $repository->createQueryBuilder('p')
+            ->where('p.childrenGoodsCategory = :children_goods_category_id AND p.childrenGoodsSubcategory = :children_goods_subcategory_id')
+            ->setParameter('children_goods_category_id', $category)
+            ->setParameter('children_goods_subcategory_id', $subcategory)
+            //->setParameter(array(1 => $category, 2 => $subcategory))
+            ->orderBy('p.title', 'ASC')
+            ->getQuery();
+
+        $childrenGoods = $query->getResult();
+
+        return $this->render('UserBundle::showSubcat.html.twig', array(
+            'childrenGoods' => $childrenGoods//$childrenGood,
+            //'delete_form' => $deleteForm->createView(),
+            //s'add_new_cat' => $add_new_cat,
+        ));
+    }
+
+    /**
+     * Deletes a childrenGoods entity.
+     *
+     * @Route("/{id}", name="childrengoods_delete")
+     * @Method("DELETE")
+     */
+    public function deleteAction(Request $request, childrenGoods $childrenGood)
+    {
+        $form = $this->createDeleteForm($childrenGood);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($childrenGood);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('childrengoods_index');
+    }
+
+    /**
+     * Creates a form to delete a childrenGoods entity.
+     *
+     * @param childrenGoods $childrenGood The childrenGoods entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(childrenGoods $childrenGood)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('childrengoods_delete', array('id' => $childrenGood->getId())))
+            ->setMethod('DELETE')
+            ->getForm()
+        ;
+    }
+
+    /**
+     * Creates a new childrenGoods entity.
+     *
+     * @Route("/bag_registr", name="bag_registr")
+     * @Method({"GET", "POST"})
+     */
+    public function BagRegistrAction(Request $request)
+    {
+        //$session = new Session();
+
+        $bagRegisrtr = new bagRegisrtr();
+        /*$childrenGoodPer = new childrenGoods();
+
+        $childrenGoodsSizeNumber = new childrenGoodsSizeNumber();
+
+        $childrenGoodSession = "nety";
+        if($session->get('childrenGood') != null){
+            $childrenGoodSession = $session->get('childrenGood');
+            $childrenGood->setTitle($childrenGoodSession->getTitle());
+            $childrenGood->setPosition($childrenGoodSession->getPosition());
+            $childrenGood->setProdDatetime($childrenGoodSession->getProdDatetime());
+            $childrenGood->setProdDatetimeUpdate($childrenGoodSession->getProdDatetimeUpdate());
+            //$admin_childrenGood->getChildrenGoodsSizeNumber()->get(0)->getSizegoods()->getSize();
+            $session-> invalidate();
+        }
+        else{
+            $childrenGood->setProdDatetime(new \DateTime('tomorrow'));
+            $childrenGood->setProdDatetimeUpdate(new \DateTime('tomorrow'));
+        }*/
+
+        /*$tag1 = new Tag();
+        $tag1->setName('tag1');
+        $task->getTags()->add($tag1);
+        $tag2 = new Tag();
+        $tag2->setName('tag2');
+        $task->getTags()->add($tag2);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $size = $em->getRepository('AdminBundle:size')->findAll();*/
+
+        $form = $this->createForm('UserBundle\Form\bagRegistrType', $bagRegisrtr);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($bagRegisrtr);
+            $em->flush();
+            //if($_POST["add_new_cat"] == 'true'){
+                //$add_new_cat = $_POST["add_new_cat"];
+                //$session->set('childrenGood', $childrenGood);
+                //$session->set('childrenGoodId', $childrenGood);
+                return $this->render('UserBundle::thanks.html.twig', array(
+                    //'childrenGood' => $childrenGood,
+                    'form' => $form->createView(),
+                    //'formSizeNumber' => $formSizeNumber->createView(),
+                    //'childrenGoodSession' => $childrenGoodSession,
+                )); 
+            //}
+
+            //return $this->redirectToRoute('childrengoods_show', 
+            //        array('id' => 1,));
+
+            //$childrenGoodMy = $_POST["children_goods"];
+            //$childrenGoodPer->setTitle($childrenGoodMy['priceGoods']);
+            //$childrenGoodPer->setPosition($childrenGoodMy['position']);
+            //$childrenGoodPer->setProdDatetime($childrenGoodMy['prodDatetime']);
+            //$childrenGoodPer->setProdDatetimeUpdate($childrenGoodMy['prodDatetimeUpdate']['date']);
+            //$childrenGoodPer->setProdDatetime(new \DateTime('tomorrow'));
+            //$childrenGoodPer->setProdDatetimeUpdate(new \DateTime('tomorrow'));
+
+            //$em = $this->getDoctrine()->getManager();
+            //$em->persist($childrenGoodPer);
+            //$em->flush();
+            //$childrenGoodsPer = $em->getRepository('AdminBundle:childrenGoods')->findAll();
+
+            //$childrenGoodId = $childrenGoodPer->getId();
+
+            /*foreach ($childrenGoodMy['childrenGoodsSizeNumber'] as $key => $value) {
+                $childrenGoodsSizeNumberMy = new childrenGoodsSizeNumber();
+                $childrenGoodsSizeNumberMy -> setChildrenGoods($value);
+            }*/
+
+            //return $this->render('childrengoods/myshow.html.twig', array(
+              //  'childrenGood' => $childrenGood,
+                //'childrenGoodMy' => $childrenGoodMy,
+                //'childrenGoodId' => $childrenGoodId,
+                //'childrenGoodPer' => $childrenGoodPer,
+            //));
+
+            /*if ($form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($childrenGood);
+                $em->flush();
+
+                return $this->redirectToRoute('childrengoods_show', 
+                    array('id' => $childrenGood->getId(),
+                        //'add_new_cat' => $add_new_cat,
+                        ));
+            }*/
+        }
+
+        return $this->render('UserBundle::bagRegisrtr.html.twig', array(
+            //'childrenGood' => $childrenGood,
+            //'form' => $form->createView(),
+            //'formSizeNumber' => $formSizeNumber->createView(),
+            //'childrenGoodSession' => $childrenGoodSession,
         ));
     }
 
@@ -168,245 +383,5 @@ class indexUserController extends Controller
         ));
 
         //return $this;
-    }
-
-    /**
-     * Creates a new childrenGoods entity.
-     *
-     * @Route("/new", name="childrengoods_new")
-     * @Method({"GET", "POST"})
-     */
-    public function newAction(Request $request)
-    {
-        $session = new Session();
-
-        $childrenGood = new childrenGoods();
-        $childrenGoodPer = new childrenGoods();
-
-        $childrenGoodsSizeNumber = new childrenGoodsSizeNumber();
-
-        $childrenGoodSession = "nety";
-        if($session->get('childrenGood') != null){
-            $childrenGoodSession = $session->get('childrenGood');
-            $childrenGood->setTitle($childrenGoodSession->getTitle());
-            $childrenGood->setPosition($childrenGoodSession->getPosition());
-            $childrenGood->setProdDatetime($childrenGoodSession->getProdDatetime());
-            $childrenGood->setProdDatetimeUpdate($childrenGoodSession->getProdDatetimeUpdate());
-            //$admin_childrenGood->getChildrenGoodsSizeNumber()->get(0)->getSizegoods()->getSize();
-            $session-> invalidate();
-        }
-        else{
-            $childrenGood->setProdDatetime(new \DateTime('tomorrow'));
-            $childrenGood->setProdDatetimeUpdate(new \DateTime('tomorrow'));
-        }
-
-        /*$tag1 = new Tag();
-        $tag1->setName('tag1');
-        $task->getTags()->add($tag1);
-        $tag2 = new Tag();
-        $tag2->setName('tag2');
-        $task->getTags()->add($tag2);
-
-        $em = $this->getDoctrine()->getManager();
-
-        $size = $em->getRepository('AdminBundle:size')->findAll();*/
-
-        $form = $this->createForm('AdminBundle\Form\childrenGoodsType', $childrenGood);
-        $form->handleRequest($request);
-
-        $formSizeNumber = $this->createForm('AdminBundle\Form\childrenGoodsSizeNumberType', $childrenGoodsSizeNumber);
-        $formSizeNumber->handleRequest($request);
-
-        if ($form->isSubmitted()) {
-            if($_POST["add_new_cat"] == 'true'){
-                //$add_new_cat = $_POST["add_new_cat"];
-                $session->set('childrenGood', $childrenGood);
-                //$session->set('childrenGoodId', $childrenGood);
-                return $this->redirectToRoute('childrengoodscategory_new'//, 
-                    /*array('id' => $childrenGood->getId(),
-                        'add_new_cat' => $add_new_cat,
-                        )*/
-                        );
-            }
-
-            //return $this->redirectToRoute('childrengoods_show', 
-            //        array('id' => 1,));
-
-            //$childrenGoodMy = $_POST["children_goods"];
-            //$childrenGoodPer->setTitle($childrenGoodMy['priceGoods']);
-            //$childrenGoodPer->setPosition($childrenGoodMy['position']);
-            //$childrenGoodPer->setProdDatetime($childrenGoodMy['prodDatetime']);
-            //$childrenGoodPer->setProdDatetimeUpdate($childrenGoodMy['prodDatetimeUpdate']['date']);
-            //$childrenGoodPer->setProdDatetime(new \DateTime('tomorrow'));
-            //$childrenGoodPer->setProdDatetimeUpdate(new \DateTime('tomorrow'));
-
-            //$em = $this->getDoctrine()->getManager();
-            //$em->persist($childrenGoodPer);
-            //$em->flush();
-            //$childrenGoodsPer = $em->getRepository('AdminBundle:childrenGoods')->findAll();
-
-            //$childrenGoodId = $childrenGoodPer->getId();
-
-            /*foreach ($childrenGoodMy['childrenGoodsSizeNumber'] as $key => $value) {
-                $childrenGoodsSizeNumberMy = new childrenGoodsSizeNumber();
-                $childrenGoodsSizeNumberMy -> setChildrenGoods($value);
-            }*/
-
-            //return $this->render('childrengoods/myshow.html.twig', array(
-              //  'childrenGood' => $childrenGood,
-                //'childrenGoodMy' => $childrenGoodMy,
-                //'childrenGoodId' => $childrenGoodId,
-                //'childrenGoodPer' => $childrenGoodPer,
-            //));
-
-            if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($childrenGood);
-                $em->flush();
-
-                return $this->redirectToRoute('childrengoods_show', 
-                    array('id' => $childrenGood->getId(),
-                        //'add_new_cat' => $add_new_cat,
-                        ));
-            }
-        }
-
-        return $this->render('childrengoods/new.html.twig', array(
-            'childrenGood' => $childrenGood,
-            'form' => $form->createView(),
-            'formSizeNumber' => $formSizeNumber->createView(),
-            'childrenGoodSession' => $childrenGoodSession,
-        ));
-    }
-
-    /**
-     * Finds and displays a childrenGoods entity.
-     *
-     * @Route("/{id}", name="user_show")
-     * @Method("GET")
-     */
-    public function showAction(childrenGoods $childrenGood, Request $request)
-    {
-        /*$add_new_cat = 'nety';
-        if(isset($_GET["add_new_cat"])){
-                //$add_new_cat = $_GET["add_new_cat"];
-                $add_new_cat = $request->query->get('add_new_cat');
-            }*/
-        
-
-        $deleteForm = $this->createDeleteForm($childrenGood);
-
-        return $this->render('UserBundle::showGood.html.twig', array(
-            'childrenGood' => $childrenGood,
-            'delete_form' => $deleteForm->createView(),
-            //s'add_new_cat' => $add_new_cat,
-        ));
-    }
-
-    /**
-     * Finds and displays a childrenGoods entity.
-     *
-     * @Route("/{children_goods_category_id}/{children_goods_subcategory_id}", name="cat_sub_show")
-     * @Method("GET")
-     */
-    public function showSubcatAction($children_goods_category_id, $children_goods_subcategory_id )// ,$children_goods_category_id, $children_goods_subcategory_id  {children_goods_category_id}/{children_goods_subcategory_id}
-    {
-        /*$add_new_cat = 'nety';
-        if(isset($_GET["add_new_cat"])){
-                //$add_new_cat = $_GET["add_new_cat"];
-                $add_new_cat = $request->query->get('add_new_cat');
-            }*/
-        
-
-        //$deleteForm = $this->createDeleteForm($childrenGood);
-
-        $em = $this->getDoctrine()->getManager();
-
-        $repository = $em->getRepository('AdminBundle:childrenGoods');
-
-        $category = $em->getRepository('AdminBundle:childrenGoodsCategory')
-                    ->findOneById($children_goods_category_id);
-
-        $subcategory = $em->getRepository('AdminBundle:childrenGoodsSubcategory')
-                    ->findOneById($children_goods_subcategory_id);
-
-        $query = $repository->createQueryBuilder('p')
-            ->where('p.childrenGoodsCategory = :children_goods_category_id AND p.childrenGoodsSubcategory = :children_goods_subcategory_id')
-            ->setParameter('children_goods_category_id', $category)
-            ->setParameter('children_goods_subcategory_id', $subcategory)
-            //->setParameter(array(1 => $category, 2 => $subcategory))
-            ->orderBy('p.title', 'ASC')
-            ->getQuery();
-
-        $childrenGoods = $query->getResult();
-
-        return $this->render('UserBundle::showSubcat.html.twig', array(
-            'childrenGoods' => $childrenGoods//$childrenGood,
-            //'delete_form' => $deleteForm->createView(),
-            //s'add_new_cat' => $add_new_cat,
-        ));
-    }
-
-    /**
-     * Displays a form to edit an existing childrenGoods entity.
-     *
-     * @Route("/{id}/edit", name="childrengoods_edit")
-     * @Method({"GET", "POST"})
-     */
-    public function editAction(Request $request, childrenGoods $childrenGood)
-    {
-        $deleteForm = $this->createDeleteForm($childrenGood);
-        $editForm = $this->createForm('AdminBundle\Form\childrenGoodsType', $childrenGood);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($childrenGood);
-            $em->flush();
-
-            return $this->redirectToRoute('childrengoods_edit', array('id' => $childrenGood->getId()));
-        }
-
-        return $this->render('childrengoods/edit.html.twig', array(
-            'childrenGood' => $childrenGood,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Deletes a childrenGoods entity.
-     *
-     * @Route("/{id}", name="childrengoods_delete")
-     * @Method("DELETE")
-     */
-    public function deleteAction(Request $request, childrenGoods $childrenGood)
-    {
-        $form = $this->createDeleteForm($childrenGood);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($childrenGood);
-            $em->flush();
-        }
-
-        return $this->redirectToRoute('childrengoods_index');
-    }
-
-    /**
-     * Creates a form to delete a childrenGoods entity.
-     *
-     * @param childrenGoods $childrenGood The childrenGoods entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(childrenGoods $childrenGood)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('childrengoods_delete', array('id' => $childrenGood->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
     }
 }

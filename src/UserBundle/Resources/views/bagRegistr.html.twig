@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Регистрация покупки</h1>
+    {#{{ dump(childrenGood) }}
+    {{ dump(childrenGoodSession) }}#}
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {#<input type="submit"  value="Готово" onclick="document.children_goods.add_new_cat.value=false;"/>
+        <input type="hidden" name="add_new_cat" value="id" />
+        <input type="submit" value="Вернуться за покупками" formnovalidate onclick="document.children_goods.add_new_cat.value=true;"/>#} <!-- document.children_goods.submit(); -->
+    {{ form_end(form) }}
+
+    <ul>
+        <li>
+            <a href="{{ path('index_user') }}">Back</a>
+        </li>
+    </ul>
+{% endblock %}
