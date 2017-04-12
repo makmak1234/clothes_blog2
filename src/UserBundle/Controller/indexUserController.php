@@ -126,53 +126,45 @@ class indexUserController extends Controller
 
                 $session->set('token', $_POST["bag_register"]["_token"]);
                 
-                //$session->set('childrenGoodId', $childrenGood);
                 return $this->redirectToRoute('index_user');
-                //return $this->render('UserBundle::thanks.html.twig');
             }
 
             if ($form->isValid()) {
-              $em = $this->getDoctrine()->getManager();
-              
-                  $query = $em->createQuery(//WHERE p.orderclient = max(p.orderclient)
-                        'SELECT max(p.orderclient)
-                        FROM UserBundle:bagRegister p
-                        '
-                    );
+                $em = $this->getDoctrine()->getManager();
 
-                  $orderclientmax = $query->getResult();//->getOrderclient();
+                $query = $em->createQuery(//WHERE p.orderclient = max(p.orderclient)
+                    'SELECT max(p.orderclient)
+                    FROM UserBundle:bagRegister p
+                    '
+                );
 
-                  print_r('orderclientmax: ');
-                  print_r($orderclientmax[0][1]); print_r('<br>');
+                $orderclientmax = $query->getResult();//->getOrderclient();
 
-                  //$bagRegister->setOrderclient($orderclientmax + 1);//select max(age) from person
-                  if($orderclientmax[0][1] < 283758){
-                     $bagRegister->setOrderclient(283758);
-                  }
-                  else{
-                    $bagRegister->setOrderclient($orderclientmax[0][1] + 1);
-                    }
+                //print_r('orderclientmax: ');
+                //print_r($orderclientmax[0][1]); print_r('<br>');
 
-              $repository = $em->getRepository('AdminBundle:childrenGoods');
+                //$bagRegister->setOrderclient($orderclientmax + 1);//select max(age) from person
+                if($orderclientmax[0][1] < 283758){
+                 $bagRegister->setOrderclient(283758);
+                }
+                else{
+                $bagRegister->setOrderclient($orderclientmax[0][1] + 1);
+                }
 
-              $idarr = $session->get('idbasketsmall');
-              $nid = $session->get('nid');
-              $sizearr = $session->get('sizearr');
-              $colorarr = $session->get('colorarr');
-              $priceall = 0;
+                $repository = $em->getRepository('AdminBundle:childrenGoods');
+
+                $idarr = $session->get('idbasketsmall');
+                $nid = $session->get('nid');
+                $sizearr = $session->get('sizearr');
+                $colorarr = $session->get('colorarr');
+                $priceall = 0;
 
                 foreach($idarr as $k=>$v){
                     $buyClients = new buyClients;
                     $childrenGoods = $repository->find($v);
                     $priceone[] = $childrenGoods->getPriceGoods()->getRub();
                     $pricegoods[] = $priceone[$k] * $nid[$k];
-                    //$priceone[$k] = $row * $n;
                     $priceall += $pricegoods[$k];
-
-                    print_r('sizearr: ');
-                    print_r($sizearr); print_r('<br>');
-                    print_r('colorarr: ');
-                    print_r($colorarr); print_r('<br>');
 
                     if ($sizearr[$k] != 'undefined') {
                         $sizeTitle[] = $childrenGoods->getChildrenGoodsSizeNumber()->get($sizearr[$k])->getSize()->getSize();
@@ -209,89 +201,45 @@ class indexUserController extends Controller
                     $email = $bagRegister->getEmail();
                     $city = $bagRegister->getCity();
                     $title[] = $childrenGoods->getTitle();
-
-                      /*$messtitle ="
-                            <div><h3>Заказ от: $name <b>  </b><h3/><div>
-                            <div><h3> Номер заказа: $order <b><font color='red'>  </font></b></h3><div>
-                            <div> Телефон:  <b> $tel </b><div>
-                            <div>  email:  <b> $email </b> <div>
-                            <div>  Город:  <b> $city </b> <div></br>
-                            <div><h3><b><font color='red'><i> Товар: </i></font></b></h3><div>";
-                        //foreach($idarr as $k=>$v){
-                                
-                                $k1 = $k + 1;
-                                $messgoods .="
-                                    <div><font color='green'> $k1) <b> $title, $sizeTitle, $colorTitle </font></b></div>
-                                    <div> <b>  $nid[$k] шт * $priceone руб = $pricegoods руб</b> </div>"; */
-                        //}
-
-                        //$smstext = "   " . $priceall . " $prsite";
                         
                 }
 
-              $em->persist($bagRegister);
-              $em->flush();
+                $em->persist($bagRegister);
+                $em->flush();
 
-              $comment = $bagRegister->getComment();
+                $comment = $bagRegister->getComment();
 
-              /*$messgoods .= "<div><h3><b><i> Всего к оплате: </i><font color='red'> $priceall </font> </b> руб </h3></div>";
+                $message = \Swift_Message::newInstance()
+                    ->setSubject('Покупки одежды')
+                    ->setFrom('send@example.com')
+                    ->setTo('qwertyfamiliya@gmail.com')
+                    ->setBody(
+                        $this->renderView(
+                            'UserBundle::emailAdmin.html.twig',
+                            array('name' => $name,
+                                    'order' => $order,
+                                    'tel' => $tel,
+                                    'email' => $email,
+                                    'city' => $city,
+                                    'title' => $title,
+                                    'sizeTitle' => $sizeTitle,
+                                    'colorTitle' => $colorTitle,
+                                    'nid' => $nid,
+                                    'priceone' => $priceone,
+                                    'pricegoods' => $pricegoods,
+                                    'comment' => $comment,
+                                    'priceall' => $priceall,
+                                )
+                        ),
+                        'text/html'
+                    );
 
-              $messgoods .= "<div>Коментарий: $comment</div>";
-                        
-                    //$textsms = $smstitle . $smstext;
-                    $mess = $messtitle . $messgoods ;
-                    
-                    // На случай если какая-то строка письма длиннее 70 символов мы используем wordwrap()
-                    $mess = wordwrap($mess, 70);
+                $this->get('mailer')->send($message);
+                //end email 
 
-                    print_r('mess: ');
-                    print_r($mess); print_r('<br>'); */
+                $session-> invalidate();
 
-                  $message = \Swift_Message::newInstance()
-                        ->setSubject('Покупки одежды')
-                        ->setFrom('send@example.com')
-                        ->setTo('qwertyfamiliya@gmail.com')
-                        ->setBody(
-                            $this->renderView(
-                                // app/Resources/views/Emails/registration.html.twig
-                                'UserBundle::emailAdmin.html.twig',
-                                array('name' => $name,
-                                        'order' => $order,
-                                        'tel' => $tel,
-                                        'email' => $email,
-                                        'city' => $city,
-                                        'title' => $title,
-                                        'sizeTitle' => $sizeTitle,
-                                        'colorTitle' => $colorTitle,
-                                        'nid' => $nid,
-                                        'priceone' => $priceone,
-                                        'pricegoods' => $pricegoods,
-                                        'comment' => $comment,
-                                        'priceall' => $priceall,
-                                    )
-                            ),
-                            'text/html'
-                            //$mess,
-                            //'text/html'
-                        )
-                        /*
-                         * If you also want to include a plaintext version of the message
-                        ->addPart(
-                            $this->renderView(
-                                'Emails/registration.txt.twig',
-                                array('name' => $name)
-                            ),
-                            'text/plain'
-                        )
-                        */
-                        ;
-                     ///////////////////// $this->get('mailer')->send($message);
-                    //end email 
-
-              $session-> invalidate();
-
-              //return $this->redirectToRoute('childrengoods_show', 
-              return $this->render('UserBundle::thanks.html.twig', array(
+                return $this->render('UserBundle::thanks.html.twig', array(
                 'name' => $name,
                 'order' => $order,
                 'tel' => $tel,

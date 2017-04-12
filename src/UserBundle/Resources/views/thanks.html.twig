@@ -1,9 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-	Thanks<br><br>
-	<b><a href="{{ path('index_user') }}">Вернуться в магазин</a>
 
-	{{ include('UserBundle::emailAdmin.html.twig') }}
+	<center style='font: 1.5em italic; color:#006600;'><a href="{{ path('index_user') }}">Вернуться в магазин</a></center>
+	<center style="font-size:1.5em; color:#669900;"><br>Спасибо! Заказ принят. В ближайшее время с вами свяжется наш менеджер</center> 
+	<center style='font-size:1.5em; color:#669900;'><br>Ваш номер заказа: <div style='font-size:2.5em; color:red;'> {{ order }}</div></center>
+
 {% endblock %}
 
