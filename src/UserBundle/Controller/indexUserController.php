@@ -38,8 +38,11 @@ class indexUserController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $childrenGoods = $em->getRepository('AdminBundle:childrenGoods')->findAll();
+ //       $childrenGoods = $em->getRepository('AdminBundle:childrenGoods')->findAll();
+
+
         $childrenGoodsCategory = $em->getRepository('AdminBundle:childrenGoodsCategory')->findAll();
+
         $sourcePath = array();
 
         $cacheManager = $this->container->get('liip_imagine.cache.manager');
@@ -52,7 +55,7 @@ class indexUserController extends Controller
         }
 
         $response = $this->render('UserBundle::indexUser.html.twig', array(
-            'childrenGoods' => $childrenGoods,
+            //'childrenGoods' => $childrenGoods,
             'childrenGoodsCategory' => $childrenGoodsCategory,
             'sourcePath' => $sourcePath,
         ));
@@ -278,7 +281,7 @@ class indexUserController extends Controller
      * @Route("/{children_goods_category_id}/{children_goods_subcategory_id}/{id}", name="user_show", requirements={"id": "\d+"})
      * @Method("GET")
      */
-    public function showAction(childrenGoods $childrenGood, Request $request, $children_goods_category_id, $children_goods_subcategory_id)
+    public function showAction(childrenGoods $childrenGood, Request $request, $children_goods_category_id, $children_goods_subcategory_id)//childrenGoods $childrenGood, 
     {
         $session = $request->getSession();
 

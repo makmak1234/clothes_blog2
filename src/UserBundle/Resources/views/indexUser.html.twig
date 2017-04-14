@@ -28,7 +28,7 @@
 
     {{ render_esi(controller('UserBundle:indexUser:smallBag')) }} 
 
-    {% block content %}
+   {% block content %}
         <div class="content">
             <div class="container">
                 <div class="slogan">
@@ -41,7 +41,7 @@
                         {% set imgLink = sourcePath[loop.index0] %}
                         {% set idDiv = "category" ~ loop.index0 %}
                         {% if i == 0 %}
-                            {#<div class="card-row clearfix">#}
+                            
                         {% endif %}
                                 <div class="col-md-4 col-sm-6 col-xs-12">
                                     <div class="card">
@@ -56,7 +56,7 @@
                                     </div>
                                 </div>
                         {% if i == 2 %}
-                           {# </div> #}
+                           
                         {% endif %}
                         {% set i = i + 1 %}
                         {% if i == 3 %}

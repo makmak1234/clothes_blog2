@@ -30,7 +30,7 @@
     {% block header %}
         {{ include('UserBundle::common_header.html.twig') }}
     {% endblock %}
-   
+
         {#{{ render_esi(controller('UserBundle:indexUser:smallBag')) }}#} 
         <div class="bubblingG">
             <span id="bubblingG_1">
@@ -57,14 +57,20 @@
                   <div class="col-sm-6 col-md-6">
                     <div class="thumbnail"> 
                         <select name="size" id="size" onChange="sizeSelect(this)" >
-                            {% for size in childrenGood.childrenGoodsSizeNumber.snapshot %} 
+                            {% for size in childrenGood.childrenGoodsSizeNumber %} 
                                 <option value="{{ size.size.size }}">{{ size.size.size }}</option> 
                             {% endfor %}
+                            {#{% for size in childrenGood.childrenGoodsSizeNumber.snapshot %} 
+                                <option value="{{ size.size.size }}">{{ size.size.size }}</option> 
+                            {% endfor %}#}
                         </select>
                         {% for size in childrenGood.childrenGoodsSizeNumber.snapshot %}           
                             {% set sizeloop = loop.index0 %}
                             <select name="size.size.size" id="{{ 'color' ~ loop.index0 }}" style="display: none;" onChange="colorSelect(this)">
-                                {% for color in size.childrenGoodsColorNumber.snapshot %}
+                                {#{% for color in size.childrenGoodsColorNumber.snapshot %}
+                                    <option value="{{ color.color.color }}">{{ color.color.color }} </option>     
+                                {% endfor %}#}
+                                {% for color in size.childrenGoodsColorNumber %}
                                     <option value="{{ color.color.color }}">{{ color.color.color }} </option>     
                                 {% endfor %}
                             </select>
